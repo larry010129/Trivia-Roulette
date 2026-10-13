@@ -1,4 +1,4 @@
-const questionBox = document.getElementById("questionBox");
+const wrapper = document.getElementById("wrapper");
 const scoreText = document.getElementById("score");
 const newQuestionButton = document.getElementById("newQuestion");
 
@@ -54,30 +54,27 @@ function getRandomQuestion() {
 }
 
 function renderQuestion(question) {
-    questionBox.innerHTML = "";
+    wrapper.innerHTML = "";
 
     const questionText = document.createElement("h2");
     questionText.innerHTML = question.question;
-    questionBox.appendChild(questionText);
+    wrapper.appendChild(questionText);
 
-    const answers = question.incorrect_answers.slice();
-    answers.push(question.correct_answer);
-    answers.sort(function () {
-        return Math.random() - 0.5;
+    const answers = [];
+    question.incorrect_answers.forEach((answer) => {
+        answers.push(answer);
     });
+    answers.push(question.correct_answer);
 
     const result = document.createElement("p");
-    let answered = false;
+    const answerButtons = [];
 
-    answers.forEach(function (answer) {
+    answers.forEach((answer) => {
         const button = document.createElement("button");
         button.innerHTML = answer;
-        button.addEventListener("click", function () {
-            if (answered) {
-                return;
-            }
-            answered = true;
+        answerButtons.push(button);
 
+        button.addEventListener("click", () => {
             if (answer === question.correct_answer) {
                 result.innerHTML = "Correct!";
                 correctCount = correctCount + 1;
@@ -85,24 +82,24 @@ function renderQuestion(question) {
                 result.innerHTML = question.correct_answer;
             }
 
-            const buttons = questionBox.querySelectorAll("button");
-            buttons.forEach(function (btn) {
+            answerButtons.forEach((btn) => {
                 btn.disabled = true;
             });
 
             totalAnswered = totalAnswered + 1;
             updateScore();
         });
-        questionBox.appendChild(button);
+
+        wrapper.appendChild(button);
     });
 
-    questionBox.appendChild(result);
+    wrapper.appendChild(result);
 }
 
 function updateScore() {
     scoreText.innerHTML = "Score: " + correctCount + " correct out of " + totalAnswered;
 }
 
-newQuestionButton.addEventListener("click", function () {
+newQuestionButton.addEventListener("click", () => {
     renderQuestion(getRandomQuestion());
 });
